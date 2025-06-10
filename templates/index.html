@@ -3,15 +3,31 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Motion Detector</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
-    <div class="container" id="app" >
-        <h1>Motion Detector</h1>
+    <div class="container" id="app">
+        <h1>Motion</h1>
 
+        <form id="uploadForm" enctype="multipart/form-data">
+            <label for="image1">Image 1:</label>
+            <input type="file" id="image1" name="image1" accept="image/*" required>
+            <br>
+            <label for="image2">Image 2:</label>
+            <input type="file" id="image2" name="image2" accept="image/*" required>
+            <br>
+            <button type="button" id="detectMotion">Detect Motion</button>
+            <button type="button" id="clearImages">Clear Images</button>
+        </form>
+
+        <div id="imagesContainer">
+            <h2>Uploaded Images</h2>
+            <div id="image1Container"></div>
+            <div id="image2Container"></div>
+        </div>
     </div>
 
     <script src="/static/script.js"></script>
