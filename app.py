@@ -24,10 +24,8 @@ app.add_middleware(
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-# Get both images
 @app.post("/submit")
 async def submit_data(image1: UploadFile = File(...), image2: UploadFile = File(...)):
-    # read bytes
     data1 = await image1.read()
     data2 = await image2.read()
 
@@ -37,5 +35,4 @@ async def submit_data(image1: UploadFile = File(...), image2: UploadFile = File(
         "filename1": image1.filename,
         "filename2": image2.filename,
         "message": "Received both files!"
-        # …plus any results you want to send back…
     })
