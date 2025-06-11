@@ -19,7 +19,7 @@
             <label for="image2">Image 2:</label>
             <input type="file" id="image2" name="image2" accept="image/*" required>
             <br>
-            <button type="button" id="detectMotion">Detect Motion</button>
+
             <button type="button" id="clearImages">Clear Images</button>
         </form>
 
@@ -28,8 +28,13 @@
             <div id="image1Container"></div>
             <div id="image2Container"></div>
         </div>
-    </div>
 
+        <button type="button" id="detectMotion">Detect Motion</button>
+        <div id="resultContainer">
+            <h2>Result</h2>
+            <div id="result"></div>
+        </div>
+    </div>
     <script src="/static/script.js"></script>
 </body>
 
