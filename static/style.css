@@ -110,4 +110,20 @@ form button {
     max-width: 100%;
     height: auto;
     border-radius: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#resultContainer {
+    margin-top: 2rem;
+    text-align: center;
+    display: none;
+}
+
+#resultContainer h2 {
+    margin-bottom: 1rem;
+}
+
+#resultContainer p {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
