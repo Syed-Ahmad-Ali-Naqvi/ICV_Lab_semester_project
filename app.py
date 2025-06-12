@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse
 from fastapi import Request, File, UploadFile
-from fastapi.responses import JSONResponse
 from fastapi.templating import Jinja2Templates
 from motiondetector import *
 
