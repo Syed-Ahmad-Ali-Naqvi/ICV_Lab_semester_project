@@ -2,38 +2,50 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Motion Detector</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css" />
 </head>
 
 <body>
-    <div class="container" id="app">
-        <h1>Motion</h1>
+    <div class="content">
+        <!-- LEFT CARD -->
+        <div class="card form-card">
+            <h1>Motion</h1>
 
-        <form id="uploadForm" enctype="multipart/form-data">
-            <label for="image1">Image 1:</label>
-            <input type="file" id="image1" name="image1" accept="image/*" required>
-            <br>
-            <label for="image2">Image 2:</label>
-            <input type="file" id="image2" name="image2" accept="image/*" required>
-            <br>
-            <button type="button" id="detectMotion">Detect Motion</button>
-            <button type="button" id="clearImages">Clear Images</button>
-        </form>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="field">
+                    <label for="image1">Image 1:</label>
+                    <input type="file" id="image1" name="image1" accept="image/*" required />
+                </div>
+                <div class="field">
+                    <label for="image2">Image 2:</label>
+                    <input type="file" id="image2" name="image2" accept="image/*" required />
+                </div>
 
-        <div id="imagesContainer">
-            <h2>Uploaded Images</h2>
-            <div id="image1Container"></div>
-            <div id="image2Container"></div>
+                <div class="buttons">
+                    <button type="button" id="methodSSD">SSD</button>
+                    <button type="button" id="methodHS">Horn-Schunck</button>
+                    <button type="button" id="methodLK">Pyr Lucas-Kanade</button>
+                    <button type="button" id="clearImages">Clear Images</button>
+                </div>
+            </form>
+
+            <div id="imagesContainer">
+                <h2>Uploaded Images</h2>
+                <div id="image1Container"></div>
+                <div id="image2Container"></div>
+            </div>
         </div>
 
-        <div id="resultContainer">
+        <!-- RIGHT CARD -->
+        <div class="card result-card" id="resultContainer">
             <h2>Result</h2>
             <div id="result"></div>
         </div>
     </div>
+
     <script src="/static/script.js"></script>
 </body>
 
