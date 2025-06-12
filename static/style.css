@@ -1,129 +1,135 @@
-/* style.css */
-
-:root {
-    --primary: #4a90e2;
-    --primary-hover: #417dc1;
-    --secondary: #e94e77;
-    --secondary-hover: #d63b5d;
-    --bg: #f0f4f8;
-    --text: #333;
-    --light: #fff;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* wrapper for the two cards */
+.content {
     display: flex;
-    justify-content: center;
-    padding: 2rem 1rem;
+    gap: 2rem;
+    align-items: flex-start;
+    padding: 2rem;
+    background: var(--bg);
+    min-height: 100vh;
 }
 
-.container {
+/* common card style */
+.card {
     background: var(--light);
-    max-width: 500px;
-    width: 100%;
-    padding: 2rem;
     border-radius: 0.75rem;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    flex: 1;
 }
 
-h1,
-h2 {
+/* make sure the form-card is not too narrow */
+.form-card {
+    max-width: 500px;
+}
+
+/* result-card can expand */
+.result-card {
+    display: none;
+    /* hidden until you get a result */
+    max-width: 600px;
+}
+
+/* show when JS needs it */
+.result-card.visible {
+    display: block;
+}
+
+/* headings */
+.form-card h1,
+.result-card h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
     text-align: center;
+}
+
+/* form fields */
+.field {
     margin-bottom: 1rem;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-form label {
+.field label {
+    display: block;
     font-weight: 500;
+    margin-bottom: 0.25rem;
 }
 
-form input[type="file"] {
+.field input[type="file"] {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #ccc;
     border-radius: 0.5rem;
+    border: 1px solid #ccc;
 }
 
-form button {
-    width: 100%;
+/* button group */
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.buttons button {
+    flex: 1;
     padding: 0.75rem;
     border: none;
     border-radius: 0.5rem;
     font-size: 1rem;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
+    transition: transform 0.1s ease;
 }
 
-#detectMotion {
+#methodSSD {
     background: var(--primary);
     color: var(--light);
 }
 
-#detectMotion:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-}
-
-#clearImages {
+#methodHS {
     background: var(--secondary);
     color: var(--light);
 }
 
-#clearImages:hover {
-    background: var(--secondary-hover);
+#methodLK {
+    background: #f5a623;
+    color: var(--light);
+}
+
+#clearImages {
+    background: #888;
+    color: var(--light);
+}
+
+.buttons button:hover {
     transform: translateY(-1px);
 }
 
+/* uploaded-images gallery */
 #imagesContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
     margin-top: 2rem;
 }
 
-#imagesContainer>h2 {
-    flex: 1 1 100%;
-    margin-bottom: 0.5rem;
+#imagesContainer h2 {
+    margin-bottom: 1rem;
     text-align: center;
 }
 
 #imagesContainer>div {
-    flex: 1 1 calc(50% - 1rem);
     display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
     justify-content: center;
 }
 
 #imagesContainer img {
-    max-width: 100%;
-    height: auto;
+    max-width: calc(50% - 0.5rem);
     border-radius: 0.5rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-#resultContainer {
-    margin-top: 2rem;
-    text-align: center;
-    display: none;
-}
-
-#resultContainer h2 {
-    margin-bottom: 1rem;
-}
-
-#resultContainer p {
-    font-size: 1.2rem;
-    font-weight: 500;
+/* result image */
+#result img {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }

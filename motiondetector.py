@@ -174,19 +174,19 @@ def motion_detect_pyr_lucas_kanade(frame1, frame2):
             cv2.arrowedLine(flow_image, (j, i), (int(j + u[i, j]), int(i + v[i, j])), (0, 255, 0), 1, tipLength=0.2)
     return flow_image
 
-image1 = cv2.imread('./eval-color-twoframes/eval-data/Urban/frame10.png')
-image2 = cv2.imread('./eval-color-twoframes/eval-data/Urban/frame11.png')
-img1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
-img2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+# image1 = cv2.imread('./eval-color-twoframes/eval-data/Urban/frame10.png')
+# image2 = cv2.imread('./eval-color-twoframes/eval-data/Urban/frame11.png')
+# img1 = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+# img2 = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
 
 
-horn_schunck_image = motion_detect_horn_schunck(img1, img2)
+# horn_schunck_image = motion_detect_horn_schunck(img1, img2)
 
-pyr_lucas_kanade_image = motion_detect_pyr_lucas_kanade(img1, img2)
+# pyr_lucas_kanade_image = motion_detect_pyr_lucas_kanade(img1, img2)
 
-ssd_image = motion_detect_ssd(img1, img2)
+# ssd_image = motion_detect_ssd(img1, img2)
 
-cv2.imshow('Horn-Schunck', horn_schunck_image)
-cv2.imshow('Pyramid Lucas-Kanade', pyr_lucas_kanade_image)
-cv2.imshow('SSD', ssd_image)
-cv2.waitKey(0)
+# cv2.imshow('Horn-Schunck', horn_schunck_image)
+# cv2.imshow('Pyramid Lucas-Kanade', pyr_lucas_kanade_image)
+# cv2.imshow('SSD', ssd_image)
+# cv2.waitKey(0)
