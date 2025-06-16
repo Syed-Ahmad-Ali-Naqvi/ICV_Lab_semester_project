@@ -4,49 +4,234 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Motion Detector</title>
-    <link rel="stylesheet" href="/static/style.css" />
+    <title>Motion Detection Comparison Tool</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .spinner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: none;
+            border-radius: 12px;
+        }
+        .method-category {
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .custom-method {
+            color: #0d6efd;
+        }
+        .library-method {
+            color: #198754;
+        }
+        .comparison-grid {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 
-<body>
-    <div class="content">
-        <!-- LEFT CARD -->
-        <div class="card form-card">
-            <h1>Motion</h1>
-
-            <form id="uploadForm" enctype="multipart/form-data">
-                <div class="field">
-                    <label for="image1">Image 1:</label>
-                    <input type="file" id="image1" name="image1" accept="image/*" required />
+<body class="bg-light">
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <h1 class="card-title mb-0">
+                            <i class="bi bi-camera-reels text-primary"></i>
+                            Motion Detection Comparison Tool
+                        </h1>
+                        <p class="text-muted mb-0">Compare custom implementations with library methods</p>
+                    </div>
                 </div>
-                <div class="field">
-                    <label for="image2">Image 2:</label>
-                    <input type="file" id="image2" name="image2" accept="image/*" required />
-                </div>
-
-                <div class="buttons">
-                    <button type="button" id="methodSSD">SSD</button>
-                    <button type="button" id="methodHS">Horn-Schunck</button>
-                    <button type="button" id="methodLK">Pyr Lucas-Kanade</button>
-                    <button type="button" id="clearImages">Clear Images</button>
-                </div>
-            </form>
-
-            <div id="imagesContainer">
-                <h2>Uploaded Images</h2>
-                <div id="image1Container"></div>
-                <div id="image2Container"></div>
             </div>
         </div>
 
-        <!-- RIGHT CARD -->
-        <div class="card result-card" id="resultContainer">
-            <h2>Result</h2>
-            <div id="result"></div>
+        <!-- Main Content -->
+        <div class="row">
+            <!-- Left Panel - Upload and Controls -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-upload"></i> Upload Images</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="image1" class="form-label">First Image</label>
+                                <input type="file" class="form-control" id="image1" name="image1" accept="image/*" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="image2" class="form-label">Second Image</label>
+                                <input type="file" class="form-control" id="image2" name="image2" accept="image/*" required>
+                            </div>
+
+                            <!-- Image Previews -->
+                            <div class="row mb-3" id="imagePreviewContainer" style="display: none;">
+                                <div class="col-6 text-center">
+                                    <h6>Image 1</h6>
+                                    <div id="image1Container"></div>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <h6>Image 2</h6>
+                                    <div id="image2Container"></div>
+                                </div>
+                            </div>
+
+                            <!-- Analysis Type -->
+                            <div class="mb-3">
+                                <label class="form-label">Analysis Type</label>
+                                <div class="btn-group-vertical w-100" role="group">
+                                    <input type="radio" class="btn-check" name="analysisType" id="singleAnalysis" value="single" checked>
+                                    <label class="btn btn-outline-primary" for="singleAnalysis">
+                                        <i class="bi bi-play-circle"></i> Single Method Analysis
+                                    </label>
+                                    
+                                    <input type="radio" class="btn-check" name="analysisType" id="compareAnalysis" value="compare">
+                                    <label class="btn btn-outline-success" for="compareAnalysis">
+                                        <i class="bi bi-compare"></i> Compare All Methods
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Single Method Selection -->
+                            <div id="singleMethodPanel" class="mb-3">
+                                <label for="methodSelect" class="form-label">Select Method</label>
+                                <select class="form-select" id="methodSelect">
+                                    <option value="">Loading methods...</option>
+                                </select>
+                            </div>
+
+                            <!-- Method Selection for Comparison -->
+                            <div id="compareMethodPanel" class="mb-3" style="display: none;">
+                                <label class="form-label">Select Methods to Compare</label>
+                                <div id="methodCheckboxes">
+                                    Loading methods...
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                <button type="button" id="analyzeBtn" class="btn btn-primary">
+                                    <span class="spinner-border spinner-border-sm me-2" id="analyzeSpinner" style="display: none;"></span>
+                                    <i class="bi bi-play-circle"></i> Analyze Motion
+                                </button>
+                                <button type="button" id="clearBtn" class="btn btn-outline-secondary">
+                                    <i class="bi bi-trash"></i> Clear All
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center Panel - Results -->
+            <div class="col-lg-5 col-md-6 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-eye"></i> Results</h5>
+                    </div>
+                    <div class="card-body position-relative">
+                        <div id="resultContainer" style="display: none;">
+                            <div id="singleResult" style="display: none;">
+                                <img id="resultImage" class="img-fluid rounded" alt="Motion Detection Result">
+                            </div>
+                            <div id="comparisonResult" style="display: none;">
+                                <img id="comparisonImage" class="comparison-grid img-fluid rounded" alt="Method Comparison">
+                            </div>
+                        </div>
+                        
+                        <div id="emptyResult" class="text-center text-muted py-5">
+                            <i class="bi bi-image display-1"></i>
+                            <p class="mt-3">Upload images and select analysis type to see results</p>
+                        </div>
+
+                        <!-- Loading Overlay -->
+                        <div id="loadingOverlay" class="spinner-overlay" style="display: none;">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mb-0">Processing motion detection...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Metrics -->
+            <div class="col-lg-3 col-md-12 mb-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="metricsContainer" style="display: none;">
+                            <!-- Single Method Metrics -->
+                            <div id="singleMetrics" style="display: none;">
+                                <div class="metric-card card p-3 mb-3">
+                                    <h6 class="text-primary mb-2">Execution Time</h6>
+                                    <div class="h4 mb-0" id="executionTime">-</div>
+                                    <small class="text-muted">seconds</small>
+                                </div>
+                                <div class="metric-card card p-3 mb-3">
+                                    <h6 class="text-success mb-2">Flow Statistics</h6>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <small class="text-muted">Mean Magnitude</small>
+                                            <div id="meanMagnitude">-</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted">Max Magnitude</small>
+                                            <div id="maxMagnitude">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comparison Metrics -->
+                            <div id="comparisonMetrics" style="display: none;">
+                                <div class="mb-3">
+                                    <canvas id="timeChart" width="400" height="200"></canvas>
+                                </div>
+                                <div id="methodsList"></div>
+                            </div>
+                        </div>
+
+                        <div id="emptyMetrics" class="text-center text-muted py-4">
+                            <i class="bi bi-graph-up display-4"></i>
+                            <p class="mt-3">Metrics will appear here after analysis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="/static/script.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/enhanced-script.js"></script>
 </body>
 
 </html>
