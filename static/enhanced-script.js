@@ -317,15 +317,15 @@
             const formData = new FormData();
             formData.append('image1', dataURItoBlob(localStorage.getItem('image1')), 'image1.png');
             formData.append('image2', dataURItoBlob(localStorage.getItem('image2')), 'image2.png');
+            formData.append('method_name', methodName);
 
-            const response = await fetch('/compare-methods', {
+            const response = await fetch('/single-method-metrics', {
                 method: 'POST',
                 body: formData
             });
 
             if (response.ok) {
-                const allResults = await response.json();
-                const methodResult = allResults[methodName];
+                const methodResult = await response.json();
 
                 if (methodResult && methodResult.success) {
                     displaySingleMethodMetrics(methodResult);

@@ -157,20 +157,7 @@ def ssd_block_matching_custom(frame1: np.ndarray, frame2: np.ndarray, block_size
 # Library implementations
 
 
-def horn_schunck_scikit(im1: np.ndarray, im2: np.ndarray, alpha: float = 1.0, max_iter: int = 100) -> Tuple[np.ndarray, np.ndarray]:
-    """Scikit-image Horn-Schunck implementation (fallback to custom if not available)."""
-    # if not SKIMAGE_FLOW_AVAILABLE:
-    print("Scikit-image optical flow not available, using custom implementation")
-    return horn_schunck_custom(im1, im2, alpha=alpha, num_iter=max_iter)
-
-    # gray1 = rgb2gray(im1) if im1.ndim == 3 else im1
-    # gray2 = rgb2gray(im2) if im2.ndim == 3 else im2
-    # u, v = optical_flow_horn_schunck(
-    #     gray1, gray2, alpha=alpha, num_iter=max_iter)
-    # return u, v
-
-
-def lucas_kanade_scikit(im1: np.ndarray, im2: np.ndarray, radius: int = 5, num_levels: int = 3) -> Tuple[np.ndarray, np.ndarray]:
+def lucas_kanade_scikit(im1: np.ndarray, im2: np.ndarray, radius: int = 7, num_warp: int = 10) -> Tuple[np.ndarray, np.ndarray]:
     """Scikit-image Lucas-Kanade implementation (fallback to custom if not available)."""
     if not SKIMAGE_FLOW_AVAILABLE:
         print("Scikit-image optical flow not available, using custom implementation")
@@ -178,7 +165,12 @@ def lucas_kanade_scikit(im1: np.ndarray, im2: np.ndarray, radius: int = 5, num_l
 
     gray1 = rgb2gray(im1) if im1.ndim == 3 else im1
     gray2 = rgb2gray(im2) if im2.ndim == 3 else im2
-    u, v = optical_flow_ilk(gray1, gray2, radius=radius, num_levels=num_levels)
+
+    # optical_flow_ilk returns flow with shape (2, height, width)
+    flow = optical_flow_ilk(gray1, gray2, radius=radius, num_warp=num_warp)
+    # First component is v (vertical), second is u (horizontal)
+    v, u = flow[0], flow[1]
+
     return u, v
 
 
@@ -195,25 +187,6 @@ def farneback_opencv(im1: np.ndarray, im2: np.ndarray, pyr_scale: float = 0.5, l
     return u, v
 
 
-def tvl1_opencv(im1: np.ndarray, im2: np.ndarray, tau: float = 0.25, lambda_: float = 0.15,
-                theta: float = 0.3, n_scales: int = 5, warps: int = 5) -> Tuple[np.ndarray, np.ndarray]:
-    """OpenCV TV-L1 optical flow implementation (fallback to Farneback if contrib not available)."""
-    gray1 = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY) if im1.ndim == 3 else im1
-    gray2 = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY) if im2.ndim == 3 else im2
-
-    try:
-        tvl1 = cv2.optflow.DualTVL1OpticalFlow_create(
-            tau=tau, lambda1=lambda_, theta=theta,
-            nscales=n_scales, warps=warps
-        )
-        flow = tvl1.calc(gray1, gray2, None)
-        u, v = flow[..., 0], flow[..., 1]
-        return u, v
-    except AttributeError:
-        print("OpenCV contrib not available, using Farneback instead of TV-L1")
-        return farneback_opencv(im1, im2)
-
-
 # Method collections
 CUSTOM_METHODS = {
     "Horn-Schunck (Custom)": horn_schunck_custom,
@@ -223,10 +196,8 @@ CUSTOM_METHODS = {
 }
 
 LIBRARY_METHODS = {
-    "Horn-Schunck (Scikit)": horn_schunck_scikit,
     "Lucas-Kanade (Scikit)": lucas_kanade_scikit,
-    "Farneback (OpenCV)": farneback_opencv,
-    "TV-L1 (OpenCV)": tvl1_opencv
+    "Farneback (OpenCV)": farneback_opencv
 }
 
 ALL_METHODS = {**CUSTOM_METHODS, **LIBRARY_METHODS}
