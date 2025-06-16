@@ -6,10 +6,12 @@ from typing import Tuple
 # Try to import scikit-image optical flow functions (may not be available in all versions)
 try:
     from skimage.color import rgb2gray
-    from skimage.registration import optical_flow_horn_schunck, optical_flow_ilk
+    from skimage.registration._optical_flow import optical_flow_ilk
+
     SKIMAGE_FLOW_AVAILABLE = True
-except ImportError:
+except ImportError as e:
     print("Warning: Scikit-image optical flow functions not available in this version")
+    print(e)
     SKIMAGE_FLOW_AVAILABLE = False
 
     def rgb2gray(image):
@@ -157,15 +159,15 @@ def ssd_block_matching_custom(frame1: np.ndarray, frame2: np.ndarray, block_size
 
 def horn_schunck_scikit(im1: np.ndarray, im2: np.ndarray, alpha: float = 1.0, max_iter: int = 100) -> Tuple[np.ndarray, np.ndarray]:
     """Scikit-image Horn-Schunck implementation (fallback to custom if not available)."""
-    if not SKIMAGE_FLOW_AVAILABLE:
-        print("Scikit-image optical flow not available, using custom implementation")
-        return horn_schunck_custom(im1, im2, alpha=alpha, num_iter=max_iter)
+    # if not SKIMAGE_FLOW_AVAILABLE:
+    print("Scikit-image optical flow not available, using custom implementation")
+    return horn_schunck_custom(im1, im2, alpha=alpha, num_iter=max_iter)
 
-    gray1 = rgb2gray(im1) if im1.ndim == 3 else im1
-    gray2 = rgb2gray(im2) if im2.ndim == 3 else im2
-    u, v = optical_flow_horn_schunck(
-        gray1, gray2, alpha=alpha, num_iter=max_iter)
-    return u, v
+    # gray1 = rgb2gray(im1) if im1.ndim == 3 else im1
+    # gray2 = rgb2gray(im2) if im2.ndim == 3 else im2
+    # u, v = optical_flow_horn_schunck(
+    #     gray1, gray2, alpha=alpha, num_iter=max_iter)
+    # return u, v
 
 
 def lucas_kanade_scikit(im1: np.ndarray, im2: np.ndarray, radius: int = 5, num_levels: int = 3) -> Tuple[np.ndarray, np.ndarray]:
