@@ -140,7 +140,6 @@ async def visualize_comparison(image1: UploadFile = File(...), image2: UploadFil
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-
 @app.get("/available-methods")
 async def get_available_methods():
     """Get list of available methods categorized."""
