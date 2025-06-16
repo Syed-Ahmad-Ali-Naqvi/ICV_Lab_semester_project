@@ -34,7 +34,6 @@ async def read_root(request: Request):
 async def single_method_analysis(image1: UploadFile = File(...), image2: UploadFile = File(...), method_name: str = Form(...)):
     """Process single method and return visualization with metrics."""
     try:
-        # Read and decode images
         data1 = await image1.read()
         data2 = await image2.read()
 
@@ -43,27 +42,22 @@ async def single_method_analysis(image1: UploadFile = File(...), image2: UploadF
         frame1 = cv2.imdecode(arr1, cv2.IMREAD_COLOR)
         frame2 = cv2.imdecode(arr2, cv2.IMREAD_COLOR)
 
-        # Convert to grayscale
         gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
         gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
         if method_name not in ALL_METHODS:
             return JSONResponse(status_code=400, content={"error": "Unknown method"})
 
-        # Get method function and compute flow
         method_func = ALL_METHODS[method_name]
         results = compare_methods(gray1, gray2, {method_name: method_func})
 
         if not results[method_name]["success"]:
             return JSONResponse(status_code=500, content={"error": results[method_name].get("error", "Method failed")})
 
-        # Get flow field (dummy implementation for now - would need to modify compare_methods)
         u, v = method_func(gray1, gray2)
 
-        # Create visualization
         result_img = create_flow_visualization(u, v, gray1, scale=3, step=15)
 
-        # Encode image
         success, buffer = cv2.imencode('.png', result_img)
         if not success:
             return JSONResponse(status_code=500, content={"error": "Encoding failed"})
@@ -78,7 +72,6 @@ async def single_method_analysis(image1: UploadFile = File(...), image2: UploadF
 async def compare_all_methods(image1: UploadFile = File(...), image2: UploadFile = File(...)):
     """Compare all methods and return comprehensive analysis."""
     try:
-        # Read and decode images
         data1 = await image1.read()
         data2 = await image2.read()
 
@@ -108,10 +101,8 @@ async def compare_all_methods(image1: UploadFile = File(...), image2: UploadFile
 async def visualize_comparison(image1: UploadFile = File(...), image2: UploadFile = File(...), selected_methods: str = Form(...)):
     """Create grid visualization comparing selected methods."""
     try:
-        # Parse selected methods
         method_names = json.loads(selected_methods)
 
-        # Read and decode images
         data1 = await image1.read()
         data2 = await image2.read()
 
@@ -120,11 +111,9 @@ async def visualize_comparison(image1: UploadFile = File(...), image2: UploadFil
         frame1 = cv2.imdecode(arr1, cv2.IMREAD_COLOR)
         frame2 = cv2.imdecode(arr2, cv2.IMREAD_COLOR)
 
-        # Convert to grayscale
         gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
         gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
-        # Get flow results for selected methods
         selected_method_funcs = {
             name: ALL_METHODS[name] for name in method_names if name in ALL_METHODS}
         flow_results = {}
@@ -137,13 +126,11 @@ async def visualize_comparison(image1: UploadFile = File(...), image2: UploadFil
                 print(f"Method {method_name} failed: {e}")
                 continue
 
-        # Create comparison grid
         if flow_results:
             grid_image = create_comparison_grid(flow_results, gray1)
         else:
             grid_image = gray1
 
-        # Encode image
         success, buffer = cv2.imencode('.png', grid_image)
         if not success:
             return JSONResponse(status_code=500, content={"error": "Encoding failed"})
