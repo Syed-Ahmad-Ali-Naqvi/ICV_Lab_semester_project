@@ -53,7 +53,8 @@ async def single_method_analysis(image1: UploadFile = File(...), image2: UploadF
         if not results[method_name]["success"]:
             return JSONResponse(status_code=500, content={"error": results[method_name].get("error", "Method failed")})
 
-        u, v = method_func(gray1, gray2)
+        # Use the flow vectors from compare_methods to avoid double execution
+        u, v = results[method_name]["flow_vectors"]
 
         result_img = create_flow_visualization(u, v, gray1, scale=3, step=15)
 
@@ -62,6 +63,40 @@ async def single_method_analysis(image1: UploadFile = File(...), image2: UploadF
             return JSONResponse(status_code=500, content={"error": "Encoding failed"})
 
         return Response(content=buffer.tobytes(), media_type="image/png")
+
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+
+@app.post("/single-method-metrics")
+async def single_method_metrics(image1: UploadFile = File(...), image2: UploadFile = File(...), method_name: str = Form(...)):
+    """Get metrics for a single method without running all methods."""
+    try:
+        data1 = await image1.read()
+        data2 = await image2.read()
+
+        arr1 = np.frombuffer(data1, np.uint8)
+        arr2 = np.frombuffer(data2, np.uint8)
+        frame1 = cv2.imdecode(arr1, cv2.IMREAD_COLOR)
+        frame2 = cv2.imdecode(arr2, cv2.IMREAD_COLOR)
+
+        gray1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+        gray2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+
+        if method_name not in ALL_METHODS:
+            return JSONResponse(status_code=400, content={"error": "Unknown method"})
+
+        method_func = ALL_METHODS[method_name]
+        results = compare_methods(gray1, gray2, {method_name: method_func})
+
+        # Add method category and remove flow_vectors for JSON response
+        result = results[method_name].copy()
+        result["category"] = get_method_category(method_name)
+        if "flow_vectors" in result:
+            # Remove heavy arrays from JSON response
+            del result["flow_vectors"]
+
+        return JSONResponse(content=result)
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
@@ -86,9 +121,12 @@ async def compare_all_methods(image1: UploadFile = File(...), image2: UploadFile
         # Compare all methods
         results = compare_methods(gray1, gray2, ALL_METHODS)
 
-        # Add method categories to results
+        # Add method categories and remove flow_vectors for JSON response
         for method_name in results:
             results[method_name]["category"] = get_method_category(method_name)
+            if "flow_vectors" in results[method_name]:
+                # Remove heavy arrays from JSON response
+                del results[method_name]["flow_vectors"]
 
         return JSONResponse(content=results)
 
@@ -138,6 +176,7 @@ async def visualize_comparison(image1: UploadFile = File(...), image2: UploadFil
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 @app.get("/available-methods")
 async def get_available_methods():

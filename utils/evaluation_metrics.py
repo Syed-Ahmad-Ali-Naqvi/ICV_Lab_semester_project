@@ -92,12 +92,14 @@ def compare_methods(frame1: np.ndarray, frame2: np.ndarray, methods: Dict[str, c
             results[method_name] = {
                 "execution_time": round(execution_time, 4),
                 "statistics": stats,
+                "flow_vectors": (u, v),  # Include flow vectors in results
                 "success": True
             }
         except Exception as e:
             results[method_name] = {
                 "execution_time": 0,
                 "statistics": {},
+                "flow_vectors": None,
                 "success": False,
                 "error": str(e)
             }
