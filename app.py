@@ -1,8 +1,7 @@
-from fastapi import FastAPI, Response, Form
+from fastapi import FastAPI, Response, Form, Request, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi import Request, File, UploadFile
 from fastapi.templating import Jinja2Templates
 import numpy as np
 import cv2
